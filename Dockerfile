@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -32,8 +32,6 @@ RUN composer install --no-dev --optimize-autoloader
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Expose port 80 and start Apache
+# Expose port 80, run migrations, and start Apache
 EXPOSE 80
-
-# Run migrations and start the server
 CMD php artisan migrate --force && apache2-foreground
